@@ -1,7 +1,7 @@
 # Mosquitto (Docker)
 
 ```sh
-$ docker run -it -p 1883:1883 -v `pwd`/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto:1.5
+$ docker run -it -p 1883:1883 -v `pwd`/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto:1.6
 ```
 
 

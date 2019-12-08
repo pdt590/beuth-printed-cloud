@@ -1,3 +1,6 @@
+# MQTT Configuration
+
+```toml
 # Config file for mosquitto
 #
 # See mosquitto.conf(5) for more information.
@@ -869,3 +872,4 @@
 #max_log_entries
 #trace_level
 #trace_output
+```
