@@ -7,6 +7,16 @@
 
 ## Setup
 
+### Setup server and docker
+
+[01. Initial Server Setup with Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04)
+
+[02. How to Set Up SSH Keys on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-1804)
+
+[03. How To Install and Use Docker on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
+
+[04. How To Install Docker Compose on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04)
+
 ### Mosquitto + InfluxDB + Telegraf + Grafana 
 
 Make sure you have `docker` and `docker-compose` installed.  
@@ -32,6 +42,12 @@ Run docker compose:
 $ docker-compose up -d
 ```
 
+Stops containers and removes containers, networks, volumes, and images created by up:
+
+```sh
+$ docker-compose down
+```
+
 Mosquitto username and password are `mqttuser` and `mqttpassword`
 To change these, see the `Optional: Update mosquitto credentials` section.
 
@@ -42,7 +58,7 @@ To change these, see the `Optional: Update mosquitto credentials` section.
 `sensors/{peripheralName}/{temperature|humidity|battery|status}`.  
 For example: `sensors/bme280/temperature`.
 
-## Grafana Setup
+## Grafana
 
 - Access Grafana from `http://<host ip>:3000`
 - Log in with user/password `admin/admin`
@@ -106,4 +122,12 @@ $ cd -
 $ docker run -d -p 3000:3000 -v $DATA_DIR/grafana:/var/lib/grafana --name=grafana grafana/grafana:5.4.3
 ```
 
-# docker exec -it mongo-dev bash
+## Go inside a docker
+
+```sh
+# Use either docker run or use docker exec with the -i (interactive) flag to keep stdin open and -t to allocate a terminal
+$ docker exec -it influxdb bash
+
+# To quit
+$ Ctrl + q
+```
