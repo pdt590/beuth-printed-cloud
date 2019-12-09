@@ -32,16 +32,49 @@ Run docker compose:
 $ docker-compose up -d
 ```
 
-Mosquitto username and passwords are `mqttuser` and `mqttpassword`.
+Mosquitto username and password are `mqttuser` and `mqttpassword`
 To change these, see the `Optional: Update mosquitto credentials` section.
 
 ## Sensors
 
-Sensors should send data to the mosquitto broker to the following topic:  
+- Sensors has to use username and password being `mqttuser` and `mqttpassword`.
+- Sensors should send data to the mosquitto broker to the following topic:  
 `sensors/{peripheralName}/{temperature|humidity|battery|status}`.  
 For example: `sensors/bme280/temperature`.
 
-## Grafana Setup (ToDo)
+## Grafana Setup
+
+- Access Grafana from `http://<host ip>:3000`
+- Log in with user/password `admin/admin`
+- Go to Configuration > Data Sources
+- Add data source (InfluxDB)
+  - Name: `InfluxDB`
+  - URL: `http://influxdb:8086`
+  - Database: `telegraf`
+  - User: `root`
+  - Password: `root`
+  - Save & Test
+- Create a Dashboard
+  - Add Graph Panel
+  - Edit Panel
+  - General
+    - Title: `Test`
+  - Metrics
+    - Data Source: InfluxDB
+    - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
+    - SELECT: `field(value)`
+    - FORMAT AS: `Time series`
+  - Display
+    - Draw modes: Lines
+    - Stacking & Null value
+      - Null value: `connected`
+  - Time range
+    - Last: `1h`
+    - Amount: `1s`
+
+- Change refresh time (Top-Right Monitor)
+  - `Last 6 hours`
+  - Refreshing every `5s`
 
 ## Optional: Update Mosquitto Credentials
 
@@ -72,3 +105,5 @@ $ cd -
 
 $ docker run -d -p 3000:3000 -v $DATA_DIR/grafana:/var/lib/grafana --name=grafana grafana/grafana:5.4.3
 ```
+
+# docker exec -it mongo-dev bash
