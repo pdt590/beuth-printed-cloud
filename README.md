@@ -1,5 +1,12 @@
 # PrintED cloud with MQTT, InfluxDB, Grafana and Telegraf
 
+## Reference
+
+- http://nilhcem.com/iot/home-monitoring-with-mqtt-influxdb-grafana
+- https://github.com/Nilhcem/home-monitoring-grafana
+- https://github.com/rawkode/influxdb-examples/blob/master/telegraf/mqtt/docker-compose.yml
+- https://community.influxdata.com/t/mqtt-input-example-needed/9840
+
 ## Projects
 
 - `mosquitto`: Mosquitto Docker container configuration files
@@ -48,7 +55,7 @@ Stops containers and removes containers, networks, volumes, and images created b
 $ docker-compose down
 ```
 
-Mosquitto username and password are `mqttuser` and `mqttpassword`
+Mosquitto username and password are `mqttuser` and `mqttpassword`.
 To change these, see the `Optional: Update mosquitto credentials` section.
 
 ## Sensors
