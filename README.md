@@ -43,6 +43,12 @@ sudo chown -R 1883:1883 ${DATA_DIR}/mosquitto
 sudo chown -R 472:472 ${DATA_DIR}/grafana
 ```
 
+Move to main folder
+
+```sh
+cd beuth-printed-cloud
+```
+
 Run docker compose:
 
 ```sh
