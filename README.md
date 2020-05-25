@@ -1,5 +1,7 @@
 # PrintED cloud with MQTT, InfluxDB, Grafana and Telegraf
 
+![achitecture](/img/architecture.png "System Achitecture")
+
 ## Reference
 
 - http://nilhcem.com/iot/home-monitoring-with-mqtt-influxdb-grafana
@@ -144,3 +146,8 @@ $ docker exec -it influxdb bash
 # To quit
 $ Ctrl + q
 ```
+
+## TODO
+
+- Fix auto deployment issue when restarting server
+- Fix persistance storage issue
