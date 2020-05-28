@@ -92,8 +92,12 @@ For example: `sensors/bme280/temperature`.
     - Title: `Test`
   - Metrics
     - Data Source: InfluxDB
-    - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
-    - SELECT: `field(value)`
+    - In the case of `data_format = "value"`
+      - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
+      - SELECT: `field(value)`
+    - In the case of `data_format = "json"`
+      - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]` or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`
+      - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`
     - FORMAT AS: `Time series`
   - Display
     - Draw modes: Lines
@@ -144,10 +148,97 @@ $ docker run -d -p 3000:3000 -v $DATA_DIR/grafana:/var/lib/grafana --name=grafan
 $ docker exec -it influxdb bash
 
 # To quit
-$ Ctrl + q
+$ Ctrl + d
 ```
 
 ## TODO
 
 - Fix auto deployment issue when restarting server
 - Fix persistance storage issue
+- Fix issue `WARNING: The DATA_DIR variable is not set. Defaulting to a blank string.`
+
+
+## Docker command
+
+- Run docker compose
+  
+  ```bash
+  docker-compose up -d
+  ```
+
+- If you want to update config
+
+  ```bash
+  # Stop running containers
+  docker-compose stop
+
+  # Change config
+
+  # Re-run again
+  docker-compose up -d
+  ```
+
+- [Other commands](https://docs.docker.com/compose/reference/overview/)
+
+  ```bash
+  # Builds, (re)creates, starts, and attaches to containers for a service.
+  docker-compose up
+
+  # Stops containers and removes containers, networks created by up.
+  docker-compose down
+
+  # Stops containers and removes containers, networks, volumes, and images created by up.
+  docker-compose down --rmi all -v --remove-orphans
+
+  # Starts existing containers for a service.
+  docker-compose start
+
+  # Stops running containers without removing them.
+  docker-compose stop
+
+  # Pauses running containers of a service.
+  docker-compose pause
+
+  # Unpauses paused containers of a service.
+  docker-compose unpause
+
+  # Lists containers.
+  docker-compose ps
+
+  # View active containers
+  docker ps
+
+  # View all containers — active and inactive
+  docker ps -a
+
+  # View the latest container you created
+  docker ps -l
+
+  # Start container
+  docker start ${CONTAINER_ID OR NAME}
+
+  # Stop container
+  docker stop ${CONTAINER_ID OR NAME}
+
+  # Restart container
+  docker restart ${CONTAINER_ID OR NAME}
+
+  # Remove container
+  docker rm ${CONTAINER_ID OR NAME}
+
+  # Remove all stopped containers
+  docker rm $(docker ps -a -q)
+
+  # Remove all containers including its volumes use
+  docker rm -vf $(docker ps -a -q)
+
+  # List the Docker images
+  docker images
+
+  # Remove image
+  docker rmi ${IMAGE_ID OR NAME}
+
+  # Remove all images
+  # Remember, you should remove all the containers before removing all the images from which those containers were created.
+  docker rmi -f $(docker images -a -q)
+  ```
