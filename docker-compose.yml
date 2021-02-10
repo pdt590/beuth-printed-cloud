@@ -14,7 +14,7 @@ services:
     restart: always
 
   influxdb:
-    image: influxdb:1.7
+    image: influxdb:1.8.4
     container_name: influxdb
     ports:
       - 8086:8086
@@ -23,7 +23,7 @@ services:
     restart: always
 
   grafana:
-    image: grafana/grafana:5.4.3
+    image: grafana/grafana:7.4.0
     container_name: grafana
     depends_on:
       - influxdb
@@ -34,7 +34,7 @@ services:
     restart: always
 
   telegraf:
-    image: telegraf:1.10
+    image: telegraf:1.17.2
     container_name: telegraf
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf

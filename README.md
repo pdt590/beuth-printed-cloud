@@ -16,10 +16,17 @@
 - https://github.com/rawkode/influxdb-examples/blob/master/telegraf/mqtt/docker-compose.yml
 - https://community.influxdata.com/t/mqtt-input-example-needed/9840
 
-## Projects
+## Project folders
 
 - `mosquitto`: Mosquitto Docker container configuration files
 - `telegraf`: Telegraf Docker container configuration files
+
+## Image Versions
+
+- `eclipse-mosquitto:1.6`
+- `telegraf:1.17.2`
+- `grafana/grafana:7.4.0`
+- `influxdb:1.7`
 
 ## Setup
 
@@ -33,49 +40,71 @@
 
 [04. How To Install Docker Compose on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04)
 
-### Mosquitto + InfluxDB + Telegraf + Grafana 
+### Mosquitto + InfluxDB + Telegraf + Grafana
 
-Make sure you have `docker` and `docker-compose` installed.  
-For the example, a Raspberry Pi 3 B+ with Raspbian will be used.
+- Make sure you have `docker` and `docker-compose` installed.
 
-Set the `DATA_DIR` environment variable to the path where will be stored local data (e.g. in `/tmp`):
+- Download configuration files in `/home/[USERNAME]/` (`[USERNAME]` is your username)
 
-```sh
-export DATA_DIR=/tmp
-```
+  ```sh
+  git clone https://github.com/pdt590/beuth-printed-cloud.git
+  ```
 
-Create data directories with write access:
+- Set the `DATA_DIR` environment variable to the path where will be stored local data (e.g. in `/tmp`):
 
-```sh
-mkdir -p ${DATA_DIR}/mosquitto/data ${DATA_DIR}/mosquitto/log ${DATA_DIR}/influxdb ${DATA_DIR}/grafana
-sudo chown -R 1883:1883 ${DATA_DIR}/mosquitto
-sudo chown -R 472:472 ${DATA_DIR}/grafana
-```
+  ```sh
+  sudo vim /etc/environment
+  # insert DATA_DIR=/tmp
+  ```
 
-Move to main folder
+- Replace `[USERNAME]` in `beuth-boot.service` by your username
 
-```sh
-cd beuth-printed-cloud
-```
+- Copy  `beuth-boot.service` in `beuth-printed-cloud` to `/etc/systemd/system`
 
-Run docker compose:
+  ```sh
+  cp beuth-printed-cloud/beuth-boot.service /etc/systemd/system/beuth-boot.service
+  ```
 
-```sh
-$ docker-compose up -d
-```
+- Make sure that `beuth-boot.sh` script is executable (IMPORTANT)
 
-Stops containers and removes containers, networks, volumes, and images created by up:
+  ```sh
+  chmod u+x /home/[USERNAME]/beuth-printed-cloud/beuth-boot.sh
+  ```
 
-```sh
-$ docker-compose down
-```
+- Start `beuth-boot.service`
 
-Mosquitto username and password are `mqttuser` and `mqttpassword`.
-To change these, see the `Optional: Update mosquitto credentials` section.
+  ```sh
+  sudo systemctl start beuth-boot.service
+  ```
+
+- Enable `beuth-boot.service` to run at boot:
+
+  ```sh
+  sudo systemctl enable beuth-boot.service
+  sudo reboot # reboot machine
+  ```
+
+- Go to main folder
+
+  ```sh
+  cd beuth-printed-cloud
+  ```
+
+- Run docker compose:
+
+  ```sh
+  docker-compose up -d
+  ```
+
+- Stops containers and removes containers, networks, volumes, and images created by up:
+
+  ```sh
+  docker-compose down
+  ```
 
 ## Sensors
 
-- Sensors has to use username and password being `mqttuser` and `mqttpassword`.
+- MQTT broker username and password are:  `mqttuser` and `mqttpassword`.
 - Sensors should send data to the mosquitto broker to the following topic:  
 `sensors/{peripheralName}/{temperature|humidity|battery|status}`.  
 For example: `sensors/bme280/temperature`.
@@ -99,12 +128,13 @@ For example: `sensors/bme280/temperature`.
     - Title: `Test`
   - Metrics
     - Data Source: InfluxDB
-    - In the case of `data_format = "value"`
-      - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
-      - SELECT: `field(value)`
-    - In the case of `data_format = "json"`
-      - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]` or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`
-      - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`
+    - Set `data_format` in `telegraf.conf`
+      - `data_format = "value"`
+        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
+        - SELECT: `field(value)`
+      - `data_format = "json"`
+        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]` or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`
+        - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`
     - FORMAT AS: `Time series`
   - Display
     - Draw modes: Lines
@@ -120,7 +150,7 @@ For example: `sensors/bme280/temperature`.
 
 ## Optional: Update Mosquitto Credentials
 
-To change default MQTT username and password, run the following, replacing `[USER]` and `[PASSWORD]`:
+Default MQTT broker username and password are `'mqttuser'` and `'mqttpassword'`. To change the username and password, run the following (replacing `[USER]` and `[PASSWORD]):
 
 ```sh
 $ cd mosquitto
@@ -157,13 +187,6 @@ $ docker exec -it influxdb bash
 # To quit
 $ Ctrl + d
 ```
-
-## TODO
-
-- Fix auto deployment issue when restarting server
-- Fix persistance storage issue
-- Fix issue `WARNING: The DATA_DIR variable is not set. Defaulting to a blank string.`
-
 
 ## Docker command
 
