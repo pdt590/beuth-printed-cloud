@@ -24,6 +24,8 @@
 
 ## Image Versions
 
+This turotial uses host-folder for persistent storage
+
 - `eclipse-mosquitto:1.6`
 - `telegraf:1.17.2`
 - `grafana/grafana:7.4.0`
@@ -106,7 +108,7 @@
 ## Sensors
 
 - MQTT broker username and password are:  `mqttuser` and `mqttpassword`.
-- Sensors should send data to the mosquitto broker to the following topic:  
+- Sensors should send data to the mosquitto broker with following topic structure: 
 `sensors/{peripheralName}/{temperature|humidity|battery|status}`.  
 For example: `sensors/bme280/temperature`.
 
@@ -151,14 +153,15 @@ For example: `sensors/bme280/temperature`.
 
 ## Optional: Update Mosquitto Credentials
 
-Default MQTT broker username and password are `'mqttuser'` and `'mqttpassword'`. To change the username and password, run the following (replacing `[USER]` and `[PASSWORD]):
+- Default MQTT broker username and password are `'mqttuser'` and `'mqttpassword'`. 
+- To change the username and password, run the following (replacing `[USER]` and `[PASSWORD]`):
 
-```sh
-$ cd mosquitto
-$ echo -n "" > users
-$ docker run --rm -v `pwd`/mosquitto.conf:/mosquitto/config/mosquitto.conf -v `pwd`/users:/mosquitto/config/users eclipse-mosquitto:1.6 mosquitto_passwd -b /mosquitto/config/users [USER] [PASSWORD]
-$ cd -
-```
+  ```sh
+  $ cd mosquitto
+  $ echo -n "" > users
+  $ docker run --rm -v `pwd`/mosquitto.conf:/mosquitto/config/mosquitto.conf -v `pwd`/users:/mosquitto/config/users eclipse-mosquitto:1.6 mosquitto_passwd -b /mosquitto/config/users [USER] [PASSWORD]
+  $ cd -
+  ```
 
 Then, update the `MQTT_USER` and `MQTT_PASSWORD` constants in all the subdirectories, and launch docker compose again.
 
