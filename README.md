@@ -63,7 +63,7 @@
 - Copy  `beuth-boot.service` in `beuth-printed-cloud` to `/etc/systemd/system`
 
   ```sh
-  cp beuth-printed-cloud/beuth-boot.service /etc/systemd/system/beuth-boot.service
+  sudo cp beuth-printed-cloud/beuth-boot.service /etc/systemd/system/beuth-boot.service
   ```
 
 - Make sure that `beuth-boot.sh` script is executable (IMPORTANT)
@@ -188,6 +188,10 @@ $ docker exec -it influxdb bash
 # To quit
 $ Ctrl + d
 ```
+
+## TODO
+
+- Fix persistent storage issue of InfluxDB and Grafana when mounting a folder on your host for the database 
 
 ## Docker command
 
