@@ -109,8 +109,8 @@ This turotial uses host-folder for persistent storage
 
 - MQTT broker username and password are:  `mqttuser` and `mqttpassword`.
 - Sensors should send data to the mosquitto broker with following topic structure: 
-`sensors/{peripheralName}/{temperature|humidity|battery|status}`.  
-For example: `sensors/bme280/temperature`.
+`sensors/{sensor_id}`.
+  For example: `sensors/Clip-AC2349` where `Clip-AC2349` is sensor id
 
 ## Grafana
 
@@ -131,13 +131,14 @@ For example: `sensors/bme280/temperature`.
     - Title: `Test`
   - Metrics
     - Data Source: InfluxDB
-    - Set `data_format` in `telegraf.conf`
-      - `data_format = "value"`
-        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
+    - If in `telegraf.conf`, set `data_format = "value"` 
+      - On dashboard panel 
+        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/Clip-xxx]`
         - SELECT: `field(value)`
-      - `data_format = "json"`
-        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]` or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`
-        - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`
+    - If in `telegraf.conf`, set `data_format = "json"`
+      - On dashboard panel 
+        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/Clip-xxx]` (or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`)
+        - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` (or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`)
     - FORMAT AS: `Time series`
   - Display
     - Draw modes: Lines
