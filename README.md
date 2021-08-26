@@ -24,7 +24,7 @@
 
 ## Image Versions
 
-This turotial uses docker-volume for persistent storage
+This turotial uses host-folder for persistent storage
 
 - `eclipse-mosquitto:1.6`
 - `telegraf:1.17.2`
@@ -53,6 +53,40 @@ This turotial uses docker-volume for persistent storage
   git clone https://github.com/pdt590/beuth-printed-cloud.git
   ```
 
+- Set the `DATA_DIR` environment variable to the path where will be stored local data (e.g. in `/tmp`):
+
+  ```sh
+  sudo vim /etc/environment
+  # insert DATA_DIR=/tmp
+  ```
+
+- Replace `[USERNAME]` in `beuth-boot.service` by your username
+
+- Copy  `beuth-boot.service` in `beuth-printed-cloud` to `/etc/systemd/system`
+
+  ```sh
+  sudo cp beuth-printed-cloud/beuth-boot.service /etc/systemd/system/beuth-boot.service
+  ```
+
+- Make sure that `beuth-boot.sh` script is executable (IMPORTANT)
+
+  ```sh
+  chmod u+x /home/[USERNAME]/beuth-printed-cloud/beuth-boot.sh
+  ```
+
+- Start `beuth-boot.service`
+
+  ```sh
+  sudo systemctl start beuth-boot.service
+  ```
+
+- Enable `beuth-boot.service` to run at boot:
+
+  ```sh
+  sudo systemctl enable beuth-boot.service
+  sudo reboot # reboot machine
+  ```
+
 - Go to main folder
 
   ```sh
@@ -74,9 +108,9 @@ This turotial uses docker-volume for persistent storage
 ## Sensors
 
 - MQTT broker username and password are:  `mqttuser` and `mqttpassword`.
-- Sensors should send data to the mosquitto broker with following topic structure:  
-`sensors/{peripheralName}/{temperature|humidity|battery|status}`.  
-For example: `sensors/bme280/temperature`.
+- Sensors should send data to the mosquitto broker with following topic structure: 
+`sensors/{sensor_id}`.
+  For example: `sensors/Clip-AC2349` where `Clip-AC2349` is sensor id
 
 ## Grafana
 
@@ -97,13 +131,14 @@ For example: `sensors/bme280/temperature`.
     - Title: `Test`
   - Metrics
     - Data Source: InfluxDB
-    - Set `data_format` in `telegraf.conf`
-      - `data_format = "value"`
-        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]`
+    - If in `telegraf.conf`, set `data_format = "value"` 
+      - On dashboard panel 
+        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/Clip-xxx]`
         - SELECT: `field(value)`
-      - `data_format = "json"`
-        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/test]` or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`
-        - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`
+    - If in `telegraf.conf`, set `data_format = "json"`
+      - On dashboard panel 
+        - FROM: `[default] [mqtt_consumer] WHERE [topic]=[sensors/Clip-xxx]` (or you can choose `WHERE [tag_key]` in which `tag_key` is in `tag_keys` of `telegraf.conf`)
+        - SELECT: `field(msg_value)` if json data is `{"msg": {"value": 100}}` (or `field(json_string_field)` in which `json_string_field` is in `json_string_fields` of `telegraf.conf`)
     - FORMAT AS: `Time series`
   - Display
     - Draw modes: Lines
@@ -120,7 +155,7 @@ For example: `sensors/bme280/temperature`.
 ## Optional: Update Mosquitto Credentials
 
 - Default MQTT broker username and password are `'mqttuser'` and `'mqttpassword'`. 
-- To change the username and password, run the following (replace `[USER]` and `[PASSWORD]`):
+- To change the username and password, run the following (replacing `[USER]` and `[PASSWORD]`):
 
   ```sh
   $ cd mosquitto
@@ -131,6 +166,23 @@ For example: `sensors/bme280/temperature`.
 
 Then, update the `MQTT_USER` and `MQTT_PASSWORD` constants in all the subdirectories, and launch docker compose again.
 
+
+## Alternative: Using Docker Manually Instead of Docker Compose
+
+```sh
+$ cd mosquitto
+$ docker run -d -p 1883:1883 -v $PWD/mosquitto.conf:/mosquitto/config/mosquitto.conf -v $PWD/users:/mosquitto/config/users -v $DATA_DIR/mosquitto/data:/mosquitto/data -v $DATA_DIR/mosquitto/log:/mosquitto/log --name mosquitto eclipse-mosquitto:1.6
+$ cd -
+
+$ docker run -d -p 8086:8086 -v $DATA_DIR/influxdb:/var/lib/influxdb --name influxdb influxdb:1.7
+
+$ cd telegraf
+$ docker run -d -v $PWD/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf --name telegraf telegraf:1.10
+$ cd -
+
+$ docker run -d -p 3000:3000 -v $DATA_DIR/grafana:/var/lib/grafana --name=grafana grafana/grafana:5.4.3
+```
+
 ## Go inside a docker
 
 ```sh
@@ -140,6 +192,10 @@ $ docker exec -it influxdb bash
 # To quit
 $ Ctrl + d
 ```
+
+## TODO
+
+- Fix persistent storage issue of InfluxDB and Grafana when mounting a folder on your host for the database 
 
 ## Docker command
 
