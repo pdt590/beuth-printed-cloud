@@ -1,6 +1,16 @@
 # PrintED cloud with MQTT, InfluxDB, Grafana and Telegraf
 
-![achitecture](/img/architecture.png "System Achitecture")
+- Architecture
+  
+![architecture](photos/architecture.png)
+
+- Dashboard
+
+![dashboard](photos/printed-dashboard.jpg)
+
+- System Deployment
+
+![system](photos/printed-system.jpg)
 
 ## Compatibility
 
@@ -192,10 +202,6 @@ $ docker exec -it influxdb bash
 # To quit
 $ Ctrl + d
 ```
-
-## TODO
-
-- Fix persistent storage issue of InfluxDB and Grafana when mounting a folder on your host for the database 
 
 ## Docker command
 
